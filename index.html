@@ -227,7 +227,7 @@
   </div>
 
   <audio id="bg-music" loop>
-    <source src="calm-loop.mp3.mp3" type="audio/mpeg" />
+    <source src="Music.mp3" type="audio/mpeg" />
     Votre navigateur ne supporte pas l’audio HTML5.
   </audio>
 
@@ -392,20 +392,61 @@
     updateVolumeSlider(false);
 
     
+    let isMuted = false;
+    let lastVolumeBeforeMute = savedVolume;
+
     document.addEventListener('keydown', (e) => {
-      // e.key === '=' détecte la touche égal
-      if (e.key === '=' || e.key === 'Enter') {
-        e.preventDefault(); // empêche le comportement par défaut si besoin
-        if (audio.paused) {
-          audio.play();
-        } else {
-          fadeOutAudio(() => {
-            updateAudioControl();
-            updateWaves();
-          });
-        }
-        updateAudioControl();
-        updateWaves();
+      switch (e.key) {
+        case '=':
+        case 'Enter':
+          e.preventDefault();
+          if (audio.paused) {
+            audio.play();
+          } else {
+            fadeOutAudio(() => {
+              updateAudioControl();
+              updateWaves();
+            });
+          }
+          updateAudioControl();
+          updateWaves();
+          break;
+
+        case 'ArrowUp':
+        case 'ArrowDown':
+          e.preventDefault();
+          if (!isMuted) {
+            const direction = e.key === 'ArrowUp' ? 1 : -1;
+            audio.volume = Math.min(1, Math.max(0, audio.volume + direction * 0.05));
+            savedVolume = audio.volume;
+            localStorage.setItem('audioVolume', savedVolume);
+            volumeRange.value = audio.volume;
+            volumeSlider.setAttribute('aria-valuenow', audio.volume.toFixed(2));
+
+            // 👇 Affiche le curseur brièvement avec l'animation
+            updateVolumeSlider(true);
+            clearTimeout(resumeTimeout);
+            resumeTimeout = setTimeout(() => updateVolumeSlider(false), 350);
+          }
+          break;
+
+
+        case 'm':
+        case 'M':
+          e.preventDefault();
+          if (!isMuted) {
+            lastVolumeBeforeMute = audio.volume;
+            audio.volume = 0;
+            volumeRange.value = 0;
+            volumeSlider.setAttribute('aria-valuenow', '0');
+            isMuted = true;
+          } else {
+            audio.volume = lastVolumeBeforeMute;
+            volumeRange.value = lastVolumeBeforeMute;
+            volumeSlider.setAttribute('aria-valuenow', lastVolumeBeforeMute.toFixed(2));
+            isMuted = false;
+          }
+          break;
       }
     });
 
