@@ -2,22 +2,22 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Ambient Mode - Gradient Sombre + Audio</title>
+  <title>Ambient Mode - ANĐOR</title>
   <style>
     html, body {
       margin: 0; padding: 0; overflow: hidden; height: 100%;
-      background: linear-gradient(270deg,
-      #6b2b01,
-      #854a02,
-      #755103,
-      #530101,
+      background: linear-gradient(135deg,
+      #c011a9,
+      #d000ff,
+      #9f7ce0,
+      #a307a8,
       #121426,
       #15193f,
       #101f4e,
       #0a2540
     );
       background-size: 1600% 1600%;
-      animation: gradientShift 320s ease infinite;
+      animation: gradientShift 280s ease infinite;
       font-family: Arial, sans-serif;
     }
 
@@ -37,13 +37,13 @@
 
     .wave-bar {
       position: absolute;
-      width: 6px; /* un peu plus large */
-      background: rgba(112, 109, 109, 0.37); /* couleur plus opaque */
-      border-radius: 3px;
+      width: 12px; /* un peu plus large */
+      background: rgba(131, 29, 156, 0.719); /* couleur plus opaque */
+      border-radius: 5px;
       transform-origin: bottom center;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      box-shadow: 0 0 12px rgba(170, 170, 170, 0.281);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 0 24px rgba(132, 100, 155, 0.815);
       animation-name: waveHeight;
       animation-timing-function: ease-in-out;
       animation-iteration-count: infinite;
@@ -51,14 +51,14 @@
     }
 
 
-    .wave-bar:nth-child(1) { height: 20px; top: calc(50% - 70px); left: 15px; animation-duration: 6s; animation-delay: 0s; }
-    .wave-bar:nth-child(2) { height: 25px; top: calc(50% - 40px); left: 30px; animation-duration: 6s; animation-delay: 1.2s; }
-    .wave-bar:nth-child(3) { height: 30px; top: calc(50% - 5px); left: 45px; animation-duration: 6s; animation-delay: 2.4s; }
-    .wave-bar:nth-child(4) { height: 25px; top: calc(50% + 25px); left: 60px; animation-duration: 6s; animation-delay: 3.6s; }
-    .wave-bar:nth-child(5) { height: 20px; top: calc(50% + 50px); left: 75px; animation-duration: 6s; animation-delay: 4.8s; }
+    .wave-bar:nth-child(1) { height: 40px; top: calc(50% - 70px); left: 15px; animation-duration: 6s; animation-delay: 0s; }
+    .wave-bar:nth-child(2) { height: 50px; top: calc(50% - 40px); left: 35px; animation-duration: 6s; animation-delay: 1.2s; }
+    .wave-bar:nth-child(3) { height: 60px; top: calc(50% - 5px); left: 55px; animation-duration: 6s; animation-delay: 2.4s; }
+    .wave-bar:nth-child(4) { height: 50px; top: calc(50% + 25px); left: 75px; animation-duration: 6s; animation-delay: 3.6s; }
+    .wave-bar:nth-child(5) { height: 40px; top: calc(50% + 50px); left: 95px; animation-duration: 6s; animation-delay: 4.8s; }
 
     @keyframes waveHeight {
-      0%, 100% { transform: scaleY(1); opacity: 0.5; }
+      0%, 100% { transform: scaleY(1); opacity: 0.2; }
       50% { transform: scaleY(1.8); opacity: 0.9; }
     }
 
@@ -111,8 +111,8 @@
       top: 17px;
       width: 6px;
       height: 26px;
-      background: rgb(128, 128, 134);
-      box-shadow: 14px 0 rgb(146, 146, 148);
+      background: rgb(135, 135, 141);
+      box-shadow: 14px 0 rgb(135, 135, 141);
       border-radius: 1px;
     }
 
@@ -227,7 +227,7 @@
   </div>
 
   <audio id="bg-music" loop>
-    <source src="C:\Users\ANDOR\Desktop\calm-loop.mp3.mp3" type="audio/mpeg" />
+    <source src="calm-loop.mp3.mp3" type="audio/mpeg" />
     Votre navigateur ne supporte pas l’audio HTML5.
   </audio>
 
@@ -394,7 +394,7 @@
     
     document.addEventListener('keydown', (e) => {
       // e.key === '=' détecte la touche égal
-      if (e.key === '=') {
+      if (e.key === '=' || e.key === 'Enter') {
         e.preventDefault(); // empêche le comportement par défaut si besoin
         if (audio.paused) {
           audio.play();
