@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ambient Mode - Gradient Sombre + Audio</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; overflow: hidden; height: 100%;
+      background: linear-gradient(270deg,
+      #6b2b01,
+      #854a02,
+      #755103,
+      #530101,
+      #121426,
+      #15193f,
+      #101f4e,
+      #0a2540
+    );
+      background-size: 1600% 1600%;
+      animation: gradientShift 320s ease infinite;
+      font-family: Arial, sans-serif;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .wave-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 120px; height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .wave-bar {
+      position: absolute;
+      width: 6px; /* un peu plus large */
+      background: rgba(112, 109, 109, 0.37); /* couleur plus opaque */
+      border-radius: 3px;
+      transform-origin: bottom center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 0 12px rgba(170, 170, 170, 0.281);
+      animation-name: waveHeight;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      transition: background-color 0.3s ease;
+    }
+
+
+    .wave-bar:nth-child(1) { height: 20px; top: calc(50% - 70px); left: 15px; animation-duration: 6s; animation-delay: 0s; }
+    .wave-bar:nth-child(2) { height: 25px; top: calc(50% - 40px); left: 30px; animation-duration: 6s; animation-delay: 1.2s; }
+    .wave-bar:nth-child(3) { height: 30px; top: calc(50% - 5px); left: 45px; animation-duration: 6s; animation-delay: 2.4s; }
+    .wave-bar:nth-child(4) { height: 25px; top: calc(50% + 25px); left: 60px; animation-duration: 6s; animation-delay: 3.6s; }
+    .wave-bar:nth-child(5) { height: 20px; top: calc(50% + 50px); left: 75px; animation-duration: 6s; animation-delay: 4.8s; }
+
+    @keyframes waveHeight {
+      0%, 100% { transform: scaleY(1); opacity: 0.5; }
+      50% { transform: scaleY(1.8); opacity: 0.9; }
+    }
+
+    #audio-control {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: pointer;
+      font-size: 16px;
+      color: rgba(56, 50, 50, 0.568);
+      user-select: none;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 10px 20px;
+      font-weight: bold;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+    }
+
+    #audio-control.button-mode {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      color: rgb(51, 46, 46);
+      font-size: 0;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+      position: fixed; /* ✅ important */
+      bottom: 20px;     /* ✅ replacé en bas */
+      left: 50%;        /* ✅ centré horizontalement */
+      transform: translateX(-50%);
+    }
+
+
+    #audio-control.button-mode::before {
+      content: "";
+      position: absolute;
+      left: 19px;
+      top: 17px;
+      width: 6px;
+      height: 26px;
+      background: rgb(128, 128, 134);
+      box-shadow: 14px 0 rgb(146, 146, 148);
+      border-radius: 1px;
+    }
+
+    #audio-control.button-mode:hover {
+      background: rgba(0, 0, 0, 0.2); /* couleur fond sombre pour fondu */
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+
+    #audio-control:not(.button-mode) {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: white !important;
+      backdrop-filter: blur(10px) !important;
+      padding: 10px 20px !important;
+      border-radius: 16px !important;
+    }
+
+    #waves.hidden {
+      display: none;
+    }
+
+    #volume-slider {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      height: 120px;
+      width: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+
+    #volume-slider.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #volume-slider input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 120px;
+      height: 8px;
+      background: transparent;
+      transform: rotate(-90deg);
+      outline: none;
+      cursor: pointer;
+    }
+
+    #volume-slider input[type=range]::-webkit-slider-runnable-track,
+    #volume-slider input[type=range]::-moz-range-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(0, 102, 153, 0.4);
+      border-radius: 4px;
+      backdrop-filter: blur(4px);
+    }
+
+    #volume-slider input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+      margin-top: 0px; /* centré verticalement */
+      transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    #volume-slider input[type=range]:hover::-webkit-slider-thumb {
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+      transform: scale(1.1);
+    }
+
+
+
+    #volume-slider input[type=range]:hover::-webkit-slider-thumb,
+    #volume-slider input[type=range]:hover::-moz-range-thumb {
+      background: rgba(255, 255, 255, 1);
+    }
+    
+  </style>
+
+</head>
+<body>
+  <div id="waves" class="wave-container">
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+  </div>
+
+  <button id="audio-control" aria-label="Contrôle audio">Cliquez ici pour lancer la musique</button>
+
+  <div id="volume-slider" aria-label="Contrôle du volume" role="slider" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.12" tabindex="0">
+    <input type="range" min="0" max="1" step="0.01" value="0.12" orient="vertical" />
+  </div>
+
+  <audio id="bg-music" loop>
+    <source src="C:\Users\ANDOR\Desktop\calm-loop.mp3.mp3" type="audio/mpeg" />
+    Votre navigateur ne supporte pas l’audio HTML5.
+  </audio>
+
+  <script>
+    const audio = document.getElementById('bg-music');
+    const waves = document.getElementById('waves');
+    const audioControl = document.getElementById('audio-control');
+    const volumeSlider = document.getElementById('volume-slider');
+    const volumeRange = volumeSlider.querySelector('input[type="range"]');
+    let resumeTimeout;
+    let fadeInterval;
+    let savedVolume = 0.12; // valeur sauvegardée du volume
+
+    // --- 2. Charger volume depuis localStorage (sinon défaut 0.12)
+    const savedVolLS = localStorage.getItem('audioVolume');
+    if (savedVolLS !== null) {
+      savedVolume = parseFloat(savedVolLS);
+    }
+    audio.volume = savedVolume;
+    volumeRange.value = savedVolume;
+    volumeSlider.setAttribute('aria-valuenow', savedVolume.toFixed(2));
+
+    // Met à jour l'affichage des vagues selon l'état de la musique
+    function updateWaves() {
+      if (!audio.paused) {
+        waves.classList.remove('hidden');
+      } else {
+        waves.classList.add('hidden');
+      }
+    }
+
+    // Met à jour l'affichage du contrôle audio (bouton texte ou pause)
+    function updateAudioControl() {
+      if (audio.paused) {
+        audioControl.classList.remove('button-mode');
+        audioControl.textContent = "Cliquez ici pour lancer la musique";
+        audioControl.setAttribute('aria-label', 'Lire la musique');
+        audioControl.style.opacity = '1'; // force visible
+      } else {
+        audioControl.classList.add('button-mode');
+        audioControl.textContent = "";
+        audioControl.setAttribute('aria-label', 'Pause la musique');
+        audioControl.style.opacity = '1'; // toujours visible
+      }
+    }
+
+    // Affiche ou cache le bouton audio comme pour le volume
+    function updateControlsVisibility(mouseX, mouseY) {
+      const btnRect = audioControl.getBoundingClientRect();
+      const sliderRect = volumeSlider.getBoundingClientRect();
+
+      function distRectToPoint(rect, x, y) {
+        const dx = Math.max(rect.left - x, x - rect.right, 0);
+        const dy = Math.max(rect.top - y, y - rect.bottom, 0);
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      const distBtn = distRectToPoint(btnRect, mouseX, mouseY);
+      const distSlider = distRectToPoint(sliderRect, mouseX, mouseY);
+      const threshold = 80;
+
+      // Gérer affichage bouton indépendamment
+      if (distBtn <= threshold) {
+        audioControl.style.transition = 'opacity 0.4s ease';
+        audioControl.style.opacity = '1';
+        audioControl.style.pointerEvents = 'auto';
+      } else {
+        // Si musique joue, fade out bouton, sinon bouton visible
+        if (!audio.paused) {
+          audioControl.style.transition = 'opacity 0.4s ease';
+          audioControl.style.opacity = '0';
+          setTimeout(() => {
+            if (audioControl.style.opacity === '0') {
+              audioControl.style.pointerEvents = 'none';
+            }
+          }, 400);
+        } else {
+          audioControl.style.opacity = '1';
+          audioControl.style.pointerEvents = 'auto';
+        }
+      }
+
+      // Gérer affichage slider indépendamment
+      if (distSlider <= threshold && !audio.paused) {
+        updateVolumeSlider(true);
+      } else {
+        updateVolumeSlider(false);
+      }
+    }
+
+
+    // Affiche ou cache le slider volume
+    function updateVolumeSlider(show) {
+      if (show) {
+        volumeSlider.classList.add('visible');
+        volumeSlider.style.pointerEvents = 'auto';
+      } else {
+        volumeSlider.classList.remove('visible');
+        volumeSlider.style.pointerEvents = 'none';
+      }
+    }
+
+    // Fade out audio progressif sur 0.4s (40 étapes de 10ms)
+    function fadeOutAudio(callback) {
+      let fadeDuration = 400; // ms
+      let fadeSteps = 40;
+      let stepTime = fadeDuration / fadeSteps;
+      let currentStep = 0;
+      let startVolume = audio.volume;
+
+      clearInterval(fadeInterval);
+      fadeInterval = setInterval(() => {
+        currentStep++;
+        let newVol = startVolume * (1 - currentStep / fadeSteps);
+        audio.volume = newVol < 0 ? 0 : newVol;
+        volumeRange.value = audio.volume;
+        volumeSlider.setAttribute('aria-valuenow', audio.volume.toFixed(2));
+        if (currentStep >= fadeSteps) {
+          clearInterval(fadeInterval);
+          audio.pause();
+          audio.volume = savedVolume; // remet le volume d'origine pour reprise
+          volumeRange.value = savedVolume;
+          volumeSlider.setAttribute('aria-valuenow', savedVolume.toFixed(2));
+          if (callback) callback();
+        }
+      }, stepTime);
+    }
+
+    // Événement clic sur le bouton audio
+    audioControl.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        updateAudioControl();
+        updateWaves();
+        audioControl.style.pointerEvents = 'auto';
+      } else {
+        fadeOutAudio(() => {
+          updateAudioControl();
+          updateWaves();
+          audioControl.style.pointerEvents = 'auto';
+        });
+      }
+    });
+
+
+    // Mise à jour du volume via slider
+    volumeRange.addEventListener('input', (e) => {
+      audio.volume = parseFloat(e.target.value);
+      savedVolume = audio.volume;
+      localStorage.setItem('audioVolume', savedVolume);
+      volumeSlider.setAttribute('aria-valuenow', savedVolume.toFixed(2));
+    });
+
+    // Moniteur de souris pour afficher/masquer bouton et slider
+    document.addEventListener('mousemove', (e) => {
+      updateControlsVisibility(e.clientX, e.clientY);
+    });
+
+    // Initialisation
+    updateAudioControl();
+    updateWaves();
+    updateVolumeSlider(false);
+
+    
+    document.addEventListener('keydown', (e) => {
+      // e.key === '=' détecte la touche égal
+      if (e.key === '=') {
+        e.preventDefault(); // empêche le comportement par défaut si besoin
+        if (audio.paused) {
+          audio.play();
+        } else {
+          fadeOutAudio(() => {
+            updateAudioControl();
+            updateWaves();
+          });
+        }
+        updateAudioControl();
+        updateWaves();
+      }
+    });
+
+
+
+
+  </script>
+</body>
+</html>
